@@ -50,7 +50,7 @@ namespace BirdsApi.Business
             var result = _collection.FindOneAndDelete(filter);
             if (result == null)
             {
-                throw new ArgumentException("Bird does not exist!");
+                throw new KeyNotFoundException("Bird does not exist!");
             }
         }
     }

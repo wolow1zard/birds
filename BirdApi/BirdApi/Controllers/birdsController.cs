@@ -22,12 +22,21 @@ namespace BirdApi.Controllers
             _birdService = service;
         }
         
+        /// <summary>
+        /// Lists the id for all visible birds
+        /// </summary>
+        [SwaggerResponse(HttpStatusCode.OK, type: typeof(List<string>))]
         public List<string> GetBirds()
         {
             return _birdService.GetAllVisibleBirds();
         }
         
+        /// <summary>
+        /// Get details on a specific bird. Even birds with visible=false are returned.
+        /// </summary>
         [SwaggerResponse(HttpStatusCode.OK, type: typeof(BirdPersistedDto))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
         public IHttpActionResult GetBird(string birdId)
         {
             if (!string.IsNullOrWhiteSpace(birdId))
@@ -46,12 +55,10 @@ namespace BirdApi.Controllers
         }
 
         /// <summary>
-        /// 
+        /// The id of the newly created bird
         /// </summary>
-        /// <param name="birdDto"></param>
-        /// <returns>The id of the newly created bird</returns>
-        /// 
         [SwaggerResponse(HttpStatusCode.OK, type: typeof(string))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
         public IHttpActionResult Post([FromBody] BirdDto birdDto)
         {
             if (birdDto.HasValidState())
@@ -65,8 +72,8 @@ namespace BirdApi.Controllers
             }
         }
         
-        
         [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
         public IHttpActionResult Put(string birdId, [FromBody] BirdDto birdDto)
         {
             if (birdDto.HasValidState())
@@ -80,14 +87,25 @@ namespace BirdApi.Controllers
             }
         }
         
-        
+        /// <summary>
+        /// Deletes a bird by id
+        /// </summary>
         [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult Delete(string birdId)
         {
             if (!string.IsNullOrWhiteSpace(birdId))
             {
-                _birdService.DeleteBird(birdId);
-                return Ok();
+                try
+                {
+                    _birdService.DeleteBird(birdId);
+                    return Ok();
+                }
+                catch (KeyNotFoundException)
+                {
+                    return NotFound();
+                }
             }
             else
             {
