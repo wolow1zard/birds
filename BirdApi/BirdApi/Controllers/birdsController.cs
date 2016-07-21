@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using System.Web.Http;
 using BirdsApi.Models;
 using BirdsApi.Business;
+using Swashbuckle.Swagger.Annotations;
 
 namespace BirdApi.Controllers
 {
@@ -25,52 +27,71 @@ namespace BirdApi.Controllers
             return _birdService.GetAllVisibleBirds();
         }
         
-        
-        public BirdPersistedDto GetBird(string birdId)
+        [SwaggerResponse(HttpStatusCode.OK, type: typeof(BirdPersistedDto))]
+        public IHttpActionResult GetBird(string birdId)
         {
             if (!string.IsNullOrWhiteSpace(birdId))
             {
-                return _birdService.GetBird(birdId);
+                var result = _birdService.GetBird(birdId);
+                if (result != null)
+                {
+                    return this.Ok(result);
+                }
+                return NotFound();
             }
             else
             {
-                return null;
+                return BadRequest();
             }
         }
 
-        public void Post([FromBody] BirdDto birdDto)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="birdDto"></param>
+        /// <returns>The id of the newly created bird</returns>
+        /// 
+        [SwaggerResponse(HttpStatusCode.OK, type: typeof(string))]
+        public IHttpActionResult Post([FromBody] BirdDto birdDto)
         {
             if (birdDto.HasValidState())
             {
-                _birdService.PersistBird(birdDto);
+                var id = _birdService.PersistBird(birdDto);
+                return this.Created($"/birds/{id}", id);
             }
             else
             {
-                //Response.StatusCode = BadRequestStatusCode;
+                return BadRequest();
             }
         }
         
-        public void Put(int birdId, [FromBody] BirdDto birdDto)
+        
+        [SwaggerResponse(HttpStatusCode.OK)]
+        public IHttpActionResult Put(string birdId, [FromBody] BirdDto birdDto)
         {
             if (birdDto.HasValidState())
             {
                 _birdService.UpdateBird(birdId, birdDto);
+                return Ok();
             }
             else
             {
-                //Response.StatusCode = BadRequestStatusCode;
+                return BadRequest();
             }
         }
         
-        public void Delete(string birdId)
+        
+        [SwaggerResponse(HttpStatusCode.OK)]
+        public IHttpActionResult Delete(string birdId)
         {
             if (!string.IsNullOrWhiteSpace(birdId))
             {
                 _birdService.DeleteBird(birdId);
+                return Ok();
             }
             else
             {
-                //Response.StatusCode = BadRequestStatusCode;
+                return BadRequest();
             }
         }
     }

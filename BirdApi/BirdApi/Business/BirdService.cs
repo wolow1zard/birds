@@ -5,59 +5,53 @@ using System.Linq;
 using BirdsApi.Models;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using AutoMapper;
 
 namespace BirdsApi.Business
 {
     public class BirdService : IBirdService
     {
-        private readonly IMongoCollection<BsonDocument> _collection;
+        private readonly IMongoCollection<BirdMongo> _collection;
         public BirdService()
         {
              var client = new MongoClient("mongodb://localhost:27017");
             var database = client.GetDatabase("birdapi");
-            _collection = database.GetCollection<BsonDocument>("birds");
+            _collection = database.GetCollection<BirdMongo>("birds");
         }
 
         public List<string> GetAllVisibleBirds()
         {
-            var documents = _collection.Find(new BsonDocument()).ToList();
-            var l = new List<string>();
-            foreach (var document in documents)
-            {
-                l.Add(((ObjectId)document.ToDictionary()["_id"]).ToString());
-            }
-            return l;
+            return _collection.AsQueryable().Where(b=> b.Visible).Select(b => b.Id).ToList().Select(o => o.ToString()).ToList();
         }
 
         public BirdPersistedDto GetBird(string birdId)
         {
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", birdId);
-            var document = _collection.Find(filter).First();
-
-            if (document != null)
-            {
-                
-            }
-            return null;
+            var oId = new ObjectId(birdId);
+            return Mapper.Map<BirdPersistedDto>(_collection.AsQueryable().SingleOrDefault(b => b.Id == oId));
         }
 
-        public void PersistBird(BirdDto birdDto)
+        public string PersistBird(BirdDto birdDto)
         {
-            if (!birdDto.HasValidState())
-            {
-                throw new ArgumentException("invalid model!");
-            }
-
-            _collection.InsertOne(birdDto.ToBsonDocument());
+            var d = Mapper.Map<BirdMongo>(birdDto);
+            _collection.InsertOne(d);
+            return d.Id.ToString();
         }
 
-        public void UpdateBird(int birdId, BirdDto birdDto)
+        public void UpdateBird(string birdId, BirdDto birdDto)
         {
-             // TODO implement
+            var filter = new BsonDocument("_id", new ObjectId(birdId));
+            //var update = new BsonDocument("$set", 
+            var update = new BsonDocument("$set", birdDto.ToBsonDocument());
+            var result = _collection.UpdateOne(filter, update);
         }
         public void DeleteBird(string birdId)
         {
-             // TODO implement
+            var filter = new BsonDocument("_id", new ObjectId(birdId));
+            var result = _collection.FindOneAndDelete(filter);
+            if (result == null)
+            {
+                throw new ArgumentException("Bird does not exist!");
+            }
         }
     }
 }

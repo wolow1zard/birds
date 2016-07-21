@@ -8,7 +8,7 @@ namespace BirdsApi.Business
         List<string> GetAllVisibleBirds();
         BirdPersistedDto GetBird(string birdId);
         void DeleteBird(string birdId);
-        void PersistBird(BirdDto birdDto);
-        void UpdateBird(int birdId, BirdDto birdDto);
+        string PersistBird(BirdDto birdDto);
+        void UpdateBird(string birdId, BirdDto birdDto);
     }
 }

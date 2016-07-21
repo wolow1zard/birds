@@ -1,6 +1,9 @@
 ﻿using Microsoft.Owin;
+using MongoDB.Bson.Serialization;
 using Owin;
 using System.Web.Http;
+using BirdsApi.Models;
+using AutoMapper;
 
 [assembly: OwinStartup(typeof(BirdApi.Startup))]
 
@@ -15,6 +18,16 @@ namespace BirdApi
 
             SwaggerConfig.Register();
              
+            BsonClassMap.RegisterClassMap<BirdPersistedDto>(m => 
+            {
+                m.AutoMap();
+            });
+
+            BsonClassMap.RegisterClassMap<BirdDto>(m => 
+            {
+                m.AutoMap();
+            });
+            
         }
     }
 }
