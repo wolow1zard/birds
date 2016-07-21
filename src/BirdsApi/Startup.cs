@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using BirdsApi.Business;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,6 +46,8 @@ namespace BirdsApi
                 options.IgnoreObsoleteActions();
                 options.IgnoreObsoleteProperties();
             });
+
+            services.AddTransient(typeof(IBirdService), typeof(BirdService));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline

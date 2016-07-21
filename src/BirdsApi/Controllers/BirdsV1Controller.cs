@@ -1,46 +1,49 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
+using BirdsApi.Models;
+using BirdsApi.Business;
 
 namespace BirdsApi.Controllers
 {
     [Route("v1")]
     public class BirdsV1Controller : Controller
     {
-        public BirdsV1Controller()
+        private readonly IBirdService _birdService;
+
+        public BirdsV1Controller(IBirdService birdService)
         {
+            _birdService = birdService;
         }
 
-        /// <summary>
-        /// Gets a testmodel with the given id, if no match is found an error is thrown
-        /// </summary>
         [HttpGet("birds")]
-        public string Get()
+        public List<string> Get()
         {
-            return "birds";
+            return _birdService.GetAllVisibleBirds();
+        }
+        
+        [HttpGet("birds/{birdId}")]
+        public BirdPersistedDto Get(string birdId)
+        {
+            return _birdService.GetBird(birdId);
         }
 
         [HttpPost("birds")]
-        public void Post(string webhookId)
+        public void Post([FromBody] BirdDto birdDto)
         {
-            // TODO implement
+            _birdService.PersistBird(birdDto);
         }
 
-        [HttpGet("birds/{birdId}")]
-        public string Get(string birdId)
-        {
-             return "a bird";
-             // TODO implement
-        }
 
         [HttpPut("birds/{birdId}")]
-        public void Put(int birdId)
+        public void Put(int birdId, [FromBody] BirdDto birdDto)
         {
-             // TODO implement
+            _birdService.UpdateBird(birdId, birdDto);
         }
 
         [HttpDelete("birds/{birdId}")]
         public void Delete(string birdId)
         {
-            // TODO implement
+            _birdService.DeleteBird(birdId);
         }
     }
 }
