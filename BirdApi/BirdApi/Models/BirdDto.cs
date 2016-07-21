@@ -25,7 +25,6 @@ namespace BirdsApi.Models
         /// Continents the bird exist on, must be atleast 1
         /// </summary>
         [Required]
-        [MinLength(1)]
         public HashSet<string> Continents { get; set; }
 
         /// <summary>

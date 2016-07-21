@@ -10,7 +10,7 @@ namespace BirdsApi.Models
         public ObjectId Id { get; set; }
         public string Name { get; set; }
         public string Family { get; set; }
-        public List<string> Continents { get; set; }
+        public HashSet<string> Continents { get; set; }
         public bool Visible { get; set; }
     }
 }
