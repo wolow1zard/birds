@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using BirdsApi.Models;
+using BirdsApiBusiness.Models;
 using BirdsApi.Business;
 
 namespace BirdsApi.Controllers
@@ -9,6 +9,7 @@ namespace BirdsApi.Controllers
     public class BirdsV1Controller : Controller
     {
         private readonly IBirdService _birdService;
+        private const int BadRequestStatusCode = 400;
 
         public BirdsV1Controller(IBirdService birdService)
         {
@@ -24,26 +25,55 @@ namespace BirdsApi.Controllers
         [HttpGet("birds/{birdId}")]
         public BirdPersistedDto Get(string birdId)
         {
-            return _birdService.GetBird(birdId);
+            if (!string.IsNullOrWhiteSpace(birdId))
+            {
+                return _birdService.GetBird(birdId);
+            }
+            else
+            {
+                Response.StatusCode = BadRequestStatusCode;
+                return null;
+            }
         }
 
         [HttpPost("birds")]
         public void Post([FromBody] BirdDto birdDto)
         {
-            _birdService.PersistBird(birdDto);
+            if (birdDto.HasValidState())
+            {
+                _birdService.PersistBird(birdDto);
+            }
+            else
+            {
+                Response.StatusCode = BadRequestStatusCode;
+            }
         }
 
 
         [HttpPut("birds/{birdId}")]
         public void Put(int birdId, [FromBody] BirdDto birdDto)
         {
-            _birdService.UpdateBird(birdId, birdDto);
+            if (birdDto.HasValidState())
+            {
+                _birdService.UpdateBird(birdId, birdDto);
+            }
+            else
+            {
+                Response.StatusCode = BadRequestStatusCode;
+            }
         }
 
         [HttpDelete("birds/{birdId}")]
         public void Delete(string birdId)
         {
-            _birdService.DeleteBird(birdId);
+            if (!string.IsNullOrWhiteSpace(birdId))
+            {
+                _birdService.DeleteBird(birdId);
+            }
+            else
+            {
+                Response.StatusCode = BadRequestStatusCode;
+            }
         }
     }
 }

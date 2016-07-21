@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BirdsApi.Models
+namespace BirdsApiBusiness.Models
 {
     public class BirdPersistedDto : BirdDto
     {
@@ -16,5 +16,13 @@ namespace BirdsApi.Models
         public List<string> Continents { get; set; }
         public string Added { get; set; }
         public bool Visible { get; set; }
+
+        public bool HasValidState()
+        {
+            return !string.IsNullOrWhiteSpace(Name) &&
+                   !string.IsNullOrWhiteSpace(Family) &&
+                   Continents != null &&
+                   !string.IsNullOrWhiteSpace(Added);
+        }
     }
 }

@@ -1,7 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using BirdsApi.Models;
+using BirdsApiBusiness.Models;
 
 namespace BirdsApi.Business
 {
@@ -44,6 +44,10 @@ namespace BirdsApi.Business
 
         public void PersistBird(BirdDto birdDto)
         {
+            if (!birdDto.HasValidState())
+            {
+                throw new ArgumentException("invalid model!");
+            }
              // TODO implement
         }
 
