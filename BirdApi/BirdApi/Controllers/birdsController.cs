@@ -3,6 +3,8 @@ using System.Net;
 using System.Web.Http;
 using BirdsApi.Models;
 using BirdsApi.Business;
+using MongoDB.Driver;
+using NLog;
 using Swashbuckle.Swagger.Annotations;
 
 namespace BirdApi.Controllers
@@ -14,7 +16,13 @@ namespace BirdApi.Controllers
 
         public birdsController()
         {
-            _birdService = new BirdService();
+            _birdService = new BirdServiceDecorator(
+                new BirdService(
+                    new MongoClient(System.Configuration.ConfigurationManager.AppSettings["mongodbconnection"]).
+                        GetDatabase("birdapi").
+                        GetCollection<BirdMongo>("birds")
+                    ),
+                LogManager.GetCurrentClassLogger());
         }
 
         public birdsController(IBirdService service)
@@ -72,6 +80,9 @@ namespace BirdApi.Controllers
             }
         }
         
+        /// <summary>
+        /// Updates a bird
+        /// </summary>
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         public IHttpActionResult Put(string birdId, [FromBody] BirdDto birdDto)

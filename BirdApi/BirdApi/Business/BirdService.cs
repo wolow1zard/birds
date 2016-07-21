@@ -12,11 +12,9 @@ namespace BirdsApi.Business
     public class BirdService : IBirdService
     {
         private readonly IMongoCollection<BirdMongo> _collection;
-        public BirdService()
+        public BirdService(IMongoCollection<BirdMongo> collection)
         {
-             var client = new MongoClient("mongodb://localhost:27017");
-            var database = client.GetDatabase("birdapi");
-            _collection = database.GetCollection<BirdMongo>("birds");
+            _collection = collection;
         }
 
         public List<string> GetAllVisibleBirds()
