@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using BirdsApiBusiness.Models;
+using BirdsApi.Models;
 
 namespace BirdsApi.Business
 {

@@ -1,29 +1,32 @@
 ﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
-using BirdsApiBusiness.Models;
+using System.Web.Http;
+using BirdsApi.Models;
 using BirdsApi.Business;
 
-namespace BirdsApi.Controllers
+namespace BirdApi.Controllers
 {
-    [Route("v1")]
-    public class BirdsV1Controller : Controller
+    public class birdsController : ApiController
     {
+        
         private readonly IBirdService _birdService;
-        private const int BadRequestStatusCode = 400;
 
-        public BirdsV1Controller(IBirdService birdService)
+        public birdsController()
         {
-            _birdService = birdService;
+            _birdService = new BirdService();
         }
 
-        [HttpGet("birds")]
-        public List<string> Get()
+        public birdsController(IBirdService service)
+        {
+            _birdService = service;
+        }
+        
+        public List<string> GetBirds()
         {
             return _birdService.GetAllVisibleBirds();
         }
         
-        [HttpGet("birds/{birdId}")]
-        public BirdPersistedDto Get(string birdId)
+        
+        public BirdPersistedDto GetBird(string birdId)
         {
             if (!string.IsNullOrWhiteSpace(birdId))
             {
@@ -31,12 +34,10 @@ namespace BirdsApi.Controllers
             }
             else
             {
-                Response.StatusCode = BadRequestStatusCode;
                 return null;
             }
         }
 
-        [HttpPost("birds")]
         public void Post([FromBody] BirdDto birdDto)
         {
             if (birdDto.HasValidState())
@@ -45,12 +46,10 @@ namespace BirdsApi.Controllers
             }
             else
             {
-                Response.StatusCode = BadRequestStatusCode;
+                //Response.StatusCode = BadRequestStatusCode;
             }
         }
-
-
-        [HttpPut("birds/{birdId}")]
+        
         public void Put(int birdId, [FromBody] BirdDto birdDto)
         {
             if (birdDto.HasValidState())
@@ -59,11 +58,10 @@ namespace BirdsApi.Controllers
             }
             else
             {
-                Response.StatusCode = BadRequestStatusCode;
+                //Response.StatusCode = BadRequestStatusCode;
             }
         }
-
-        [HttpDelete("birds/{birdId}")]
+        
         public void Delete(string birdId)
         {
             if (!string.IsNullOrWhiteSpace(birdId))
@@ -72,7 +70,7 @@ namespace BirdsApi.Controllers
             }
             else
             {
-                Response.StatusCode = BadRequestStatusCode;
+                //Response.StatusCode = BadRequestStatusCode;
             }
         }
     }
